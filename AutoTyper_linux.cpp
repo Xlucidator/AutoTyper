@@ -88,9 +88,9 @@ void simulateInputFromChar(Display* display, char ch) {
     XFlush(display);
 }
 
-
-int global_left_brace = 0;
 #define FIT_SPACE_AUTOFILL
+#define VIEW_SPACE_AS_TAB
+#define FIT_BRACKETS_AUTOPAIR
 
 inline int countLeadingSpace(const char* str) { // assume only ' ' no '\t'
     int cnt = 0;
@@ -111,7 +111,11 @@ void processLine(Display* display, const char* str) {
     if (delta >= 0) {
         for (int i = 0; i < delta; ++i) simulateInputFromChar(display, ' ');
     } else {
+    #ifdef VIEW_SPACE_AS_TAB
+        for (int i = 0; i > delta; i -= 4) simulateInputFromChar(display, '\b');
+    #else
         for (int i = 0; i > delta; --i) simulateInputFromChar(display, '\b');
+    #endif
     }
 
     base_leading_space = cur_leading_space;

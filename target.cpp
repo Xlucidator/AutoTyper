@@ -4,7 +4,7 @@
 
 using namespace std;
 
-const int MAXO = 22, MAXN = 80;
+const int MAXO = 21 + 21 + 2, MAXN = 79 + 79 + 2;
 const int NUL = 0x3f3f3f3f;
 
 int M/* Oxygen */, N/* Nitrogen */, K;
@@ -25,7 +25,6 @@ int main() {
             }
         }
     }
-    cout << dp[M][N] << endl;
 
     int res = NUL;
     for (int j = M; j < MAXO; ++j) {
@@ -39,5 +38,3 @@ int main() {
     return 0;
 }
 
-
-//done
