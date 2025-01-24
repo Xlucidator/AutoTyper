@@ -45,6 +45,7 @@ std::unordered_map<char, KeySym> char_to_keysyms = {
     {'\n', XK_Return},
     {'\r', XK_Return},
     {'\t', XK_Tab},
+    {'\b', XK_BackSpace}
 };
 
 

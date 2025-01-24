@@ -7,7 +7,7 @@
 #include <cstring>
 #include <fstream>
 #include <unistd.h>
-#include <vector>
+#include <string>
 
 #include "AutoTyper.h"
 
@@ -16,7 +16,7 @@ using namespace std;
 char test_letter[] = "qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM";
 char test_number[] = "1234567890";
 char test_symbol[] = "~!@#$%^&*()_+-={}[]|\\:\";\'<>?,./ ";
-char test_escape[] = "\t\n\r";
+char test_escape[] = "\t\n\r\b";
 
 unordered_map<KeySym, bool> keysymNeedModifier;
 
@@ -47,7 +47,7 @@ inline bool findModifier(const KeySym& keysym, KeySym& modifier) {
     return false;
 }
 
-bool validate(Display *display, char* test_buf) {
+bool validate(Display* display, char* test_buf) {
     bool condition = true;
     char chbuf[2] = {0, 0}; int len = strlen(test_buf);
     for (int i = 0; i < len; ++i) {
@@ -69,13 +69,13 @@ inline KeySym getKeysymFromChar(char ch) {
     return (0 <= ch && ch < 0x20) ? (0xff00) | ((int) ch) : ((int) ch);
 }
 
-void simulateKey(Display *display, KeySym key, bool press) {
+void simulateKey(Display* display, KeySym key, bool press) {
     KeyCode keycode = XKeysymToKeycode(display, key);
     if (keycode == 0) return; // Invalid
     XTestFakeKeyEvent(display, keycode, press, CurrentTime);
 }
 
-void simulateInputFromChar(Display *display, char ch) {
+void simulateInputFromChar(Display* display, char ch) {
     KeySym keysym = getKeysymFromChar(ch), modifier;
     bool has_modifier = findModifier(keysym, modifier);
     printf("ch = \'%c\', KeySym = %lu, KeyCode = %u, press shift = %d\n", ch, keysym, XKeysymToKeycode(display, keysym), has_modifier);
@@ -86,6 +86,42 @@ void simulateInputFromChar(Display *display, char ch) {
     if (has_modifier) simulateKey(display, modifier, false);
 
     XFlush(display);
+}
+
+
+int global_left_brace = 0;
+#define FIT_SPACE_AUTOFILL
+
+inline int countLeadingSpace(const char* str) { // assume only ' ' no '\t'
+    int cnt = 0;
+    while (str[cnt] == ' ') cnt++;
+    return cnt;
+}
+
+void processLine(Display* display, const char* str) {
+    int len = strlen(str);
+
+    int cur_leading_space = 0;
+
+#ifdef FIT_SPACE_AUTOFILL
+    static int base_leading_space = 0;
+
+    cur_leading_space = countLeadingSpace(str);
+    int delta = cur_leading_space - base_leading_space;
+    if (delta >= 0) {
+        for (int i = 0; i < delta; ++i) simulateInputFromChar(display, ' ');
+    } else {
+        for (int i = 0; i > delta; --i) simulateInputFromChar(display, '\b');
+    }
+
+    base_leading_space = cur_leading_space;
+#endif
+    
+    for (int i = cur_leading_space; i < len; ++i) {
+        simulateInputFromChar(display, str[i]);
+        usleep(5000);
+    }
+    simulateInputFromChar(display, '\n');
 }
 
 bool isKeyPressed(Display *display, KeySym key) {
@@ -132,13 +168,12 @@ int main() {
         }
         
         printf("[Typing...]\n");
-        char chbuf[2] = {0, 0};
-        while (file.get(chbuf[0])) {
+        // char ch;
+        string line;
+        while (getline(file, line)) {
             if (isKeyPressed(display, XK_Escape)) break;
-            simulateInputFromChar(display, chbuf[0]);
-            usleep(5000); // 延时 0.5 毫秒
+            processLine(display, line.c_str());
         }
-        
 
         file.close();
         break;
