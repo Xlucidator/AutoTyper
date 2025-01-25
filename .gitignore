@@ -1,6 +1,7 @@
 *.exe
 *.obj
 *.o
+*.out
 .vscode
 build
 
@@ -9,3 +10,4 @@ log.txt
 AutoTyper_linux
 AutoTyper
 a.out
+target.cpp
