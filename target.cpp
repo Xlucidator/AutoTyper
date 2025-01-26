@@ -1,40 +1,25 @@
 #include <iostream>
-#include <algorithm>
-#include <cstring>
 
 using namespace std;
 
-const int MAXO = 21 + 21 + 2, MAXN = 79 + 79 + 2;
-const int NUL = 0x3f3f3f3f;
+const int MAXN = 1002;
 
-int M/* Oxygen */, N/* Nitrogen */, K;
-int dp[MAXO][MAXN];
+int dp[MAXN];
+int n;
+int book[4] = {10, 20, 50, 100};
 
 int main() {
-    scanf("%d%d%d", &M, &N, &K);
-
-    memset(dp, 0x3f, sizeof(dp));
-    dp[0][0] = 0;
-
-    int a, b, c;
-    for (int i = 0; i < K; ++i) {
-        scanf("%d%d%d", &a, &b, &c);
-        for (int j = MAXO - 1; j >= a; --j) {
-            for (int k = MAXN - 1; k >= b; --k) {
-                dp[j][k] = min(dp[j][k], dp[j-a][k-b] + c);
-            }
+    cin >> n; 
+    dp[0] = 1;
+    
+    int cost;
+    for (int i = 0; i < 4; ++i) {
+        cost = book[i];
+        for (int j = cost; j <= n; ++j) {
+            dp[j] += dp[j-cost];
         }
     }
-
-    int res = NUL;
-    for (int j = M; j < MAXO; ++j) {
-        for (int k = N; k < MAXN; ++k) {
-            res = min(res, dp[j][k]);
-        }
-    }
-
-    printf("%d\n", res);
+    cout << dp[n] << endl;
 
     return 0;
 }
-

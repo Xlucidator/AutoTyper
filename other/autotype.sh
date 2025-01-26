@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # 指定文件路径
-file_path="target.cpp"
+file_path="../target.cpp"
 
 # 确保文件存在
 if [ ! -f "$file_path" ]; then

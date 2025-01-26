@@ -9,7 +9,7 @@
 #include <unistd.h>
 #include <string>
 
-#include "AutoTyper.h"
+#include "AutoTyper_linux.h"
 
 using namespace std;
 

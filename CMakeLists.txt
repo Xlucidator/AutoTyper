@@ -5,7 +5,7 @@ project(AutoTyper)
 set(CMAKE_CXX_STANDARD 17)
 # set(CMAKE_CXX_FLAGS_DEBUG "$ENV{CXXFLAGS} -O0 -Wall -g")
 
-### OS Dectect
+### OS Dectect & Configure Links
 if(WIN32 OR CMAKE_SYSTEM_NAME STREQUAL "Windows")
     message(STATUS "Building on Windows")
     add_definitions(-DWINDOWS_PLATFORM)
@@ -19,7 +19,7 @@ if(WIN32 OR CMAKE_SYSTEM_NAME STREQUAL "Windows")
         message(STATUS "Using MinGW")
 
         add_compile_options(-Wall -Wextra -pedantic)
-        target_link_libraries(AutoTyper user32)
+        # target_link_libraries(AutoTyper user32)
     endif()
 
 elseif(UNIX OR CMAKE_SYSTEM_NAME STREQUAL "Linux")
@@ -39,7 +39,7 @@ elseif(UNIX OR CMAKE_SYSTEM_NAME STREQUAL "Linux")
 endif()
 
 ### Includes
-# include_directories(${CMAKE_SOURCE_DIR}/include)
+include_directories(${CMAKE_SOURCE_DIR}/src)
 
 ### Source
 file(GLOB_RECURSE SRC ${CMAKE_SOURCE_DIR}/src/*.cpp)
