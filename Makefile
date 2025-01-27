@@ -1,7 +1,7 @@
 ## Cross-platform Makefile for AutoTyper
 
 # Phony targets
-.PHONY: all clean
+.PHONY: all clean release debug
 
 # OS detection
 
@@ -15,7 +15,7 @@ endif
 
 # Variables
 CXX = g++
-CXX_FLAGS = -Wall -O2 -std=c++17
+CXX_FLAGS = -Wall -Os -s -std=c++17 -ffunction-sections -fdata-sections
 
 # Platform-specific settings
 ifeq ($(PLATFORM),WINDOWS)
