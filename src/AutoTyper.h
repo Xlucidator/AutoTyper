@@ -12,7 +12,7 @@
 
 using KeySym = UINT; // Virtual-Key Code
 using KeyCode = BYTE; // Scan Code
-#define SLEEP(utime) Sleep(utime)
+#define SLEEP(utime) Sleep(utime/1000.0)
 
 #elif __linux__
 
@@ -34,15 +34,19 @@ public:
     bool init();
     bool type(const std::string& file_path);
     bool clear();
+
+    void debug();
 private:
     void processLine(const char* str);
     void simulateChar(char ch);
     inline int countLeadingSpace(const char* str);
     
-    inline bool isKeyPressed(KeySym keysym);
+    inline bool getKeyFromChar(char ch, KeyCode& key, KeyCode& modifier);
     inline void simulateKey(KeyCode key, bool press);
     inline void keyPress(KeyCode key);
     inline void keyRelease(KeyCode key);
+    inline bool isKeyPressed(KeySym keysym);
+    inline void flushDisplay();
 
 #ifdef _WIN32
     INPUT input[5] = {};

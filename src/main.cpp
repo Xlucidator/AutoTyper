@@ -7,10 +7,12 @@
 int main() {
     /*=== Set Configs ===*/
     initConfig();
+    printConfig();
     
     /*=== AutoTyper ===*/
     AutoTyper typer;
     typer.type(io_srcfile);
+    // typer.debug();
 
     return 0;
 }

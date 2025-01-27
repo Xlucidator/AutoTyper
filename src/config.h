@@ -13,5 +13,6 @@ extern bool fit_space_autofill;
 
 /* Function */
 void initConfig();
+void printConfig();
 
 #endif // CONFIG_H

@@ -46,3 +46,12 @@ void initConfig() {
         SET_CONFIG(fit, space_autofill, false);
     }
 }
+
+void printConfig() {
+    std::cout << "[Config]" << std::endl;
+    printf("input: %s\n", io_srcfile.c_str());
+    printf("target: %s\n", io_target.c_str());
+    printf("\tview_space_as_tab: %d\n", fit_view_space_as_tab);
+    printf("\tbrackets_autopair: %d\n", fit_view_space_as_tab);
+    printf("\tspace_autofill: %d\n", fit_space_autofill);
+}
