@@ -1,22 +1,53 @@
-## Build AutoTyper on Linux
+## Cross-platform Makefile for AutoTyper
 
 # Phony targets
 .PHONY: all clean
 
+# OS detection
+
+ifeq ($(OS),Windows_NT)
+    $(info $(OS): Running on Windows)
+    PLATFORM = WINDOWS
+else
+    $(info $(OS): Running on Unix-like system)
+    PLATFORM = LINUX
+endif
+
 # Variables
 CXX = g++
-CXX_FLAGS = -Wall -O2
-LIBS = -lX11 -lXtst
-TARGET = AutoTyper_linux
-SRC = AutoTyper_linux.cpp
+CXX_FLAGS = -Wall -O2 -std=c++17
+
+# Platform-specific settings
+ifeq ($(PLATFORM),WINDOWS)
+    LIBS = -lUser32
+    TARGET = AutoTyper.exe
+    RM = del /f /q
+    CLEAN_FILES = src\*.o $(TARGET)
+else
+    LIBS = -lX11 -lXtst
+    TARGET = AutoTyper
+    RM = rm -f
+    CLEAN_FILES = src/*.o src/**/*.o $(TARGET)
+endif
+
+# Directories & Files
+SRC_DIR = src
+SRC_FILES := $(wildcard $(SRC_DIR)/**/*.cpp $(SRC_DIR)/*.cpp)
+HDR_FILES := $(wildcard $(SRC_DIR)/**/*.h $(SRC_DIR)/*.h)
+OBJ_FILES := $(patsubst %.cpp,%.o,$(SRC_FILES))
 
 # Default target
 all: $(TARGET)
+	@echo Build on $(OS)
 
-# Compile and link in one step
-$(TARGET): $(SRC)
-	$(CXX) $(CXX_FLAGS) -o $@ $< $(LIBS)
+# Link target
+$(TARGET): $(OBJ_FILES)
+	$(CXX) $(CXX_FLAGS) -o $@ $^ $(LIBS)
+
+# Compile source code to object files
+%.o: %.cpp $(HDR_FILES)
+	$(CXX) $(CXX_FLAGS) -c $< -o $@
 
 # Clean target
 clean:
-	rm -f $(TARGET)
+	$(RM) $(CLEAN_FILES)

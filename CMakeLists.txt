@@ -8,7 +8,6 @@ set(CMAKE_CXX_STANDARD 17)
 ### OS Dectect & Configure Links
 if(WIN32 OR CMAKE_SYSTEM_NAME STREQUAL "Windows")
     message(STATUS "Building on Windows")
-    add_definitions(-DWINDOWS_PLATFORM)
     
     if(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
         message(STATUS "Using Microsoft Visual Studio")
@@ -24,7 +23,6 @@ if(WIN32 OR CMAKE_SYSTEM_NAME STREQUAL "Windows")
 
 elseif(UNIX OR CMAKE_SYSTEM_NAME STREQUAL "Linux")
     message(STATUS "Configuring for Ubuntu/Linux")
-    add_definitions(-DLINUX_PLATFORM)
     
     add_compile_options(-Wall -Wextra -pedantic)
     find_package(X11 REQUIRED)

@@ -39,19 +39,19 @@ bool INIParser::load(const std::string& path) {
     return true;
 }
 
-template<typename T>
-T INIParser::get(const std::string& section, const std::string& key, const T& default_value) const {
-    auto it = ini_db.find(section);
-    if (it != ini_db.end()) {
-        auto sect = it->second;
+// template<typename T>
+// T INIParser::get(const std::string& section, const std::string& key, const T& default_value) const {
+//     auto it = ini_db.find(section);
+//     if (it != ini_db.end()) {
+//         auto sect = it->second;
 
-        auto sit = sect.find(key);
-        if (sit != sect.end()) {
-            return convert<T>(sit->second);
-        }
-    }
-    return default_value;
-}
+//         auto sit = sect.find(key);
+//         if (sit != sect.end()) {
+//             return convert<T>(sit->second);
+//         }
+//     }
+//     return default_value;
+// }
 
 std::string INIParser::trim(const std::string& str) {
     const char* white_space = " \t\n\r";
@@ -60,15 +60,15 @@ std::string INIParser::trim(const std::string& str) {
     return start == std::string::npos ? "" : str.substr(start, end - start + 1);
 }
 
-template<typename T>
-T INIParser::convert(const std::string& value) const {
-    if constexpr (std::is_same<T, int>::value) {
-        return std::stoi(value);
-    } else if constexpr (std::is_same<T, bool>::value) {
-        return (value == "true") || (value == "1");
-    } else if constexpr (std::is_same<T, std::string>::value) {
-        return value;
-    } else {
-        throw std::runtime_error("Unsupport type for get()");
-    }
-}
+// template<typename T>
+// T INIParser::convert(const std::string& value) const {
+//     if constexpr (std::is_same<T, int>::value) {
+//         return std::stoi(value);
+//     } else if constexpr (std::is_same<T, bool>::value) {
+//         return (value == "true") || (value == "1");
+//     } else if constexpr (std::is_same<T, std::string>::value) {
+//         return value;
+//     } else {
+//         throw std::runtime_error("Unsupport type for get()");
+//     }
+// }

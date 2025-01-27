@@ -87,7 +87,7 @@ void AutoTyper::simulateChar(char ch) {
     }
     KeyCode key = keysym & 0xff;
     bool has_modifier = (keysym >> 8) & 0x1; // TODO: other modifier (& 0xff) & 0x2/0x4 
-    printf("ch = \'%c\', KeySym = %lu, KeyCode = %u, press shift = %d\n", ch, keysym, key, has_modifier);
+    printf("ch = \'%c\', KeySym = %u, KeyCode = %u, press shift = %d\n", ch, keysym, key, has_modifier);
 
     idx = 0;
     if (has_modifier) simulateKey(VK_SHIFT, true);
