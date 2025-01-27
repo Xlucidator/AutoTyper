@@ -29,7 +29,7 @@ void initConfig() {
         fit_brackets_autopair = true;
         fit_space_autofill = true;
     } else if (io_target == "vscode") {
-        fit_view_space_as_tab = false;
+        fit_view_space_as_tab = true;
         fit_brackets_autopair = true;
         fit_space_autofill = true;
     } else if (io_target == "gedit") {
@@ -52,6 +52,6 @@ void printConfig() {
     printf("input: %s\n", io_srcfile.c_str());
     printf("target: %s\n", io_target.c_str());
     printf("\tview_space_as_tab: %d\n", fit_view_space_as_tab);
-    printf("\tbrackets_autopair: %d\n", fit_view_space_as_tab);
+    printf("\tbrackets_autopair: %d\n", fit_brackets_autopair);
     printf("\tspace_autofill: %d\n", fit_space_autofill);
 }

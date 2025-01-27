@@ -87,6 +87,7 @@ void AutoTyper::processLine(const char* str) {
         simulateChar(str[i]);
         if (fit_brackets_autopair && (str[i] == '{' || str[i] == '[' || str[i] == '(')) {
             simulateChar('\x7f');
+            if (isBlankTail(str + i + 1)) base_leading_space += 4;
         }
         USLEEP(type_interval);
     }

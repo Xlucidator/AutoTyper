@@ -7,4 +7,14 @@ inline int countLeadingSpace(const char* str) { // assume only ' ' no '\t'
     return cnt;
 }
 
+inline bool isBlank(char ch) {
+    return ch == ' ' || ch == '\t';
+}
+
+inline bool isBlankTail(const char* str) {
+    int i = 0;
+    while (str[i] != '\0') if (!isBlank(str[i])) return false;
+    return true;
+}
+
 #endif
