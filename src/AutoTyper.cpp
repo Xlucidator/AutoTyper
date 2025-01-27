@@ -1,6 +1,11 @@
 #include "AutoTyper.h"
 
+#include "utils.h"
+#include "config.h"
+
 #include <fstream>
+#include <unistd.h>
+#include <cstring>
 
 /*=== Global Public Process Function ===*/
 
@@ -8,9 +13,10 @@ bool AutoTyper::init() {
 #ifdef __linux__
     display = XOpenDisplay(NULL);
     if (!display) {
-        cerr << "[Error] Failed to open X display" << endl;
+        std::cerr << "[Error] Failed to open X display" << std::endl;
         return false;
     }
+    initModifier();
 #endif
     return true;
 }
@@ -25,12 +31,12 @@ bool AutoTyper::type(const std::string& file_path) {
         return false;
     }
     std::cout << "success, pause for 3s..." << std::endl;
-    SLEEP(3000 * 1000);
+    USLEEP(3000 * 1000);
 
     std::cout << "[Typing] ..." << std::endl;
     std::string line;
     while (std::getline(file_to_type, line)) {
-        if(isKeyPressed(VK_ESCAPE)) break;
+        if (isKeyPressed(ESCAPE_KEY)) break;
         processLine(line.c_str());
     }
 
@@ -46,35 +52,15 @@ bool AutoTyper::clear() {
 }
 
 void AutoTyper::debug() {
-    int key_num[130]={0,0,0,0,0,0,0,0,0,0,13,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,32,1049,11222,1051,1052,1053,1055,10222,11057,1048,1056,1107,188,109,190,111,48,49,50,51,52,53,54,55,56,57,1186,186,11188,187,1190,1191,1050,1065,1066,1067,1068,1069,1070,1071,1072,1073,1074,1075,1076,1077,1078,1079,1080,1081,1082,1083,1084,1085,1086,1087,1088,1089,1090,10219,220,221,1054,1189,192,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,0,1220,1221,1192};
-
-    SLEEP(1000 * 1000);
-    std::cout << key_num['<'] << std::endl;
+#ifdef _WIN32
     simulateChar('<');
-    
-    SHORT result = VkKeyScanA('\b');
-    BYTE virtualKey = LOBYTE(result);  // 低字节是虚拟键码
-    BYTE shiftState = HIBYTE(result);  // 高字节是 Shift 状态
-
-    std::cout << "Character: '\\b'" << std::endl;
-    std::cout << "Virtual Key Code: " << (int)virtualKey << std::endl;
-    std::cout << "Shift State: " << (int)shiftState << std::endl;
-
-    result = VkKeyScanA('\x7f');
-    virtualKey = LOBYTE(result);  // 低字节是虚拟键码
-    shiftState = HIBYTE(result);  // 高字节是 Shift 状态
-
-    std::cout << "Character: '\\x7f' (Delete)" << std::endl;
-    std::cout << "Virtual Key Code: " << (int)virtualKey << std::endl;
-    std::cout << "Shift State: " << (int)shiftState << std::endl;
-
     simulateChar('\x7f');
     simulateChar('\n');
     simulateChar('\r');
-
-    std::cout << key_num['>'] << std::endl;
     simulateChar('>');
-    
+#elif __linux__
+    simulateChar('a');
+#endif
 }
 
 
@@ -102,15 +88,9 @@ void AutoTyper::processLine(const char* str) {
         if (fit_brackets_autopair && (str[i] == '{' || str[i] == '[' || str[i] == '(')) {
             simulateChar('\x7f');
         }
-        SLEEP(type_interval);
+        USLEEP(type_interval);
     }
     simulateChar('\n');
-}
-
-inline int AutoTyper::countLeadingSpace(const char* str) { // assume only ' ' no '\t'
-    int cnt = 0;
-    while (str[cnt] == ' ') cnt++;
-    return cnt;
 }
 
 void AutoTyper::simulateChar(char ch) {  
@@ -127,7 +107,8 @@ void AutoTyper::simulateChar(char ch) {
 }
 
 
-/*=== OS Concerned ===*/
+/*=== PAL: OS Concerned ===*/
+#ifdef _WIN32
 
 inline bool AutoTyper::getKeyFromChar(char ch, KeyCode& key, KeyCode& modifier) {
     /* Exception:  
@@ -141,7 +122,7 @@ inline bool AutoTyper::getKeyFromChar(char ch, KeyCode& key, KeyCode& modifier) 
         return false;
     }
 
-    /* Common Porcess */
+    /* Common Process */
     SHORT keysym = VkKeyScanA(ch);
     if (keysym == -1) {
         std::cerr << "[Error] Character \'" << ch << "\' cannot be mapped to a virtual key.\n";
@@ -172,10 +153,75 @@ inline bool AutoTyper::isKeyPressed(KeySym keysym) {
     return GetAsyncKeyState(keysym) & 0x8000;
 }
 
-inline void AutoTyper::keyPress(KeyCode key) {
-    keybd_event(key, 0, 0, 0);
+// Deprecated keybd_event
+// inline void AutoTyper::keyPress(KeyCode key) {
+//     keybd_event(key, 0, 0, 0);
+// }
+
+// inline void AutoTyper::keyRelease(KeyCode key) {
+//     keybd_event(key, 0, KEYEVENTF_KEYUP, 0);
+// }
+
+#elif __linux__
+
+bool AutoTyper::initModifier() {
+    int min_keycode, max_keycode;
+    XDisplayKeycodes(display, &min_keycode, &max_keycode);
+
+    int keysyms_per_keycode;
+    KeySym* keymap = XGetKeyboardMapping(display, min_keycode, max_keycode - min_keycode + 1, &keysyms_per_keycode);
+
+    for (int kc = min_keycode; kc <= max_keycode; ++kc) {
+        for (int i = 1; i >= 0; --i) {  // front(0) over back(1)
+            KeySym keysym = keymap[(kc - min_keycode) * keysyms_per_keycode + i];
+            keysymNeedModifier[keysym] = i;
+        } // only in the 0 column do not need modifier
+    }
+
+    XFree(keymap);
+    return true;
 }
 
-inline void AutoTyper::keyRelease(KeyCode key) {
-    keybd_event(key, 0, KEYEVENTF_KEYUP, 0);
+inline bool AutoTyper::getKeyFromChar(char ch, KeyCode& key, KeyCode& modifier) {
+    KeySym keysym;
+
+    /* Exception
+       ch | ascii |   Name   | Value
+       \n |  0xa  | Linefeed | 0xff0a  <- [set \n to XK_Return 0xff0d] Do not fit the transform
+       \r |  0xd  | Return   | 0xff0d 
+    */ if (ch == '\n') {
+        keysym = XK_Return;
+    } else {
+        keysym =  (0 <= ch && ch < 0x20) ? (0xff00) | ((int) ch) : ((int) ch);
+    }
+   
+    /* Common Porcess */
+    key = XKeysymToKeycode(display, keysym);
+    auto it = keysymNeedModifier.find(keysym);
+    if (it != keysymNeedModifier.end()) {
+        modifier = XKeysymToKeycode(display, XK_Shift_L);
+        return it->second;
+    }
+    return false;
 }
+
+inline void AutoTyper::flushDisplay() {
+    XFlush(display);
+}
+
+inline void AutoTyper::simulateKey(KeyCode key, bool press) {
+    if (key == 0) {
+        std::cerr << "[Error] Invalid key code" << std::endl;
+        return; // Invalid
+    }
+    XTestFakeKeyEvent(display, key, press, CurrentTime);
+}
+
+inline bool AutoTyper::isKeyPressed(KeySym keysym) {
+    char keys[32];
+    XQueryKeymap(display, keys);
+    KeyCode keycode = XKeysymToKeycode(display, keysym);
+    return keys[keycode / 8] & (1 << (keycode % 8));
+}
+
+#endif

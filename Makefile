@@ -38,7 +38,7 @@ OBJ_FILES := $(patsubst %.cpp,%.o,$(SRC_FILES))
 
 # Default target
 all: $(TARGET)
-	@echo Build on $(OS)
+	@echo Build on $(PLATFORM)
 
 # Link target
 $(TARGET): $(OBJ_FILES)

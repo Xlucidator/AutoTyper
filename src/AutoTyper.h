@@ -4,25 +4,28 @@
 #include <iostream>
 #include <string>
 
-#include "config.h"
-
 #ifdef _WIN32
 
 #include <windows.h>
 
 using KeySym = UINT; // Virtual-Key Code
 using KeyCode = BYTE; // Scan Code
-#define SLEEP(utime) Sleep(utime/1000.0)
+#define USLEEP(utime) Sleep(utime/1000.0)
+constexpr auto ESCAPE_KEY = VK_ESCAPE;
 
 #elif __linux__
 
 #include <X11/Xlib.h>
 #include <X11/XKBlib.h>
+#include <X11/extensions/XTest.h>
 #include <X11/keysym.h>
+
+#include <unordered_map>
 
 using KeySym = ::KeySym; // X11 KeySym
 using KeyCode = ::KeyCode; // X11 KeyCode
-#define SLEEP(utime) usleep(utime)
+#define USLEEP(utime) usleep(utime)
+constexpr auto ESCAPE_KEY = XK_Escape;
 
 #endif
 
@@ -39,12 +42,9 @@ public:
 private:
     void processLine(const char* str);
     void simulateChar(char ch);
-    inline int countLeadingSpace(const char* str);
     
     inline bool getKeyFromChar(char ch, KeyCode& key, KeyCode& modifier);
     inline void simulateKey(KeyCode key, bool press);
-    inline void keyPress(KeyCode key);
-    inline void keyRelease(KeyCode key);
     inline bool isKeyPressed(KeySym keysym);
     inline void flushDisplay();
 
@@ -54,6 +54,9 @@ private:
 
 #elif __linux__
     Display* display = nullptr;
+    std::unordered_map<KeySym, bool> keysymNeedModifier;
+
+    bool initModifier();
 #endif
 };
 
