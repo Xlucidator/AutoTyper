@@ -15,7 +15,8 @@ endif
 
 # Variables
 CXX = g++
-CXX_FLAGS = -Wall -Os -s -std=c++17 -ffunction-sections -fdata-sections
+CXX_FLAGS = -Wall -Os -std=c++17 -ffunction-sections -fdata-sections # -fno-rtti -fomit-frame-pointer
+LD_FLAGS += -s -Wl,--gc-sections # -Wl,-strip-all
 
 # Platform-specific settings
 ifeq ($(PLATFORM),WINDOWS)
@@ -42,7 +43,7 @@ all: $(TARGET)
 
 # Link target
 $(TARGET): $(OBJ_FILES)
-	$(CXX) $(CXX_FLAGS) -o $@ $^ $(LIBS)
+	$(CXX) $(CXX_FLAGS) $(LD_FLAGS) -o $@ $^ $(LIBS)
 
 # Compile source code to object files
 %.o: %.cpp $(HDR_FILES)
