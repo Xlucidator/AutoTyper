@@ -60,4 +60,11 @@ private:
 #endif
 };
 
+/* Custom Char to Map Key */
+#define CHAR_LEFT    0x80
+#define CHAR_RIGHT   0x81
+#define CHAR_UP      0x82
+#define CHAR_DOWN    0x83
+
+
 #endif // AUTOTYPER_H

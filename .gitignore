@@ -4,6 +4,7 @@
 *.out
 .vscode
 build
+bin
 
 test.txt
 log.txt

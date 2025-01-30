@@ -6,6 +6,7 @@
 #include <fstream>
 #include <unistd.h>
 #include <cstring>
+#include <stack>
 
 /*=== Global Public Process Function ===*/
 
@@ -52,12 +53,23 @@ bool AutoTyper::clear() {
 }
 
 void AutoTyper::debug() {
+    printf("[Debug]\n");
+    USLEEP(1000 * 1000);
+
 #ifdef _WIN32
     simulateChar('<');
     simulateChar('\x7f');
     simulateChar('\n');
     simulateChar('\r');
     simulateChar('>');
+
+    char ch = 0x81;
+    unsigned char uch = 0x81;
+    printf("%d\n", ch == uch);
+    switch ((unsigned char)ch) {
+        case 0x81: printf("match\n"); break;
+        default:break;
+    }
 #elif __linux__
     simulateChar('a');
 #endif
@@ -65,11 +77,16 @@ void AutoTyper::debug() {
 
 
 /*=== Private Function ===*/
-
+#define USE_METHOD_2
 void AutoTyper::processLine(const char* str) {
     int len = strlen(str);
+    // space_autofill
     static int base_leading_space = 0;
     int cur_leading_space = 0;
+    // brace_nextline_pair
+#ifdef USE_METHOD_1
+    static std::stack<bool> open_brace;
+#endif
 
     if (fit_space_autofill) {
         cur_leading_space = countLeadingSpace(str);
@@ -84,11 +101,47 @@ void AutoTyper::processLine(const char* str) {
     }
 
     for (int i = cur_leading_space; i < len; ++i) {
-        simulateChar(str[i]);
-        if (fit_brackets_autopair && (str[i] == '{' || str[i] == '[' || str[i] == '(')) {
-            simulateChar('\x7f');
-            if (isBlankTail(str + i + 1)) base_leading_space += 4;
+    
+    #ifdef USE_METHOD_1
+        if (fit_brace_nextline_pair) {
+            if (str[i] == '{') {
+                open_brace.push(i == len - 1 ? 1 : 0); // only last '{' would be take into count
+                if (isBlankTail(str + i + 1)) base_leading_space += 4; // '{' & '{ ' would both arouse '\t' nextline 
+            } else if (str[i] == '}' && !open_brace.empty()) {
+                bool need_modify = open_brace.top(); open_brace.pop();
+                if (need_modify) {
+                    if (isBlankHead(str, str + i - 1)) {
+                        int step = fit_view_space_as_tab ? 4 : 1;
+                        for (int k = 0; k <= base_leading_space; k += step) simulateChar('\b'); // backspace to last line
+                        simulateChar(CHAR_DOWN); // move cursor down, reuse the '}' generated before <=> opened brace decrease
+                        continue;
+                    } else { // WARN: would change input content, but will not effect syntax and compile
+                        simulateChar(CHAR_DOWN); // directly move cursor down
+                        continue;
+                    }
+                }
+            }
         }
+    #endif
+        
+        simulateChar(str[i]);
+        
+        if (fit_brackets_autopair) {
+            if ((str[i] == '{' && !fit_brace_nextline_pair) || str[i] == '[' || str[i] == '(') {
+                simulateChar('\x7f');
+                if (isBlankTail(str + i + 1)) base_leading_space += 4;
+            }
+        }
+
+    #ifdef USE_METHOD_2
+        if (fit_brace_nextline_pair) { // WARN: would change input content slightly -> one more space behind '{' with blank tail
+            if (str[i] == '{' && isBlankTail(str + i + 1)) {
+                simulateChar(' '); // to destroy the nextline pair
+                base_leading_space += 4;
+            }
+        }
+    #endif
+
         USLEEP(type_interval);
     }
     simulateChar('\n');
@@ -118,15 +171,22 @@ inline bool AutoTyper::getKeyFromChar(char ch, KeyCode& key, KeyCode& modifier) 
         \b   | BackSpace |  0x8  | 0x8
         \r   |  Return   |  0xd  | 0xd
         \n   | Linefeed  |  0xa  | 0xd  <- Delight to see
-    */ if (ch == '\x7f') {
-        key = VK_DELETE;
-        return false;
+    */
+    /* Custom map: ch >= 127 */
+    switch ((unsigned char)ch) {
+        case '\x7f'     : key = VK_DELETE;  return false;
+        case CHAR_LEFT  : key = VK_LEFT;    return false;
+        case CHAR_RIGHT : key = VK_RIGHT;   return false;
+        case CHAR_UP    : key = VK_UP;      return false;
+        case CHAR_DOWN  : key = VK_DOWN;    return false;
+        default: break;
     }
 
     /* Common Process */
     SHORT keysym = VkKeyScanA(ch);
     if (keysym == -1) {
         std::cerr << "[Error] Character \'" << ch << "\' cannot be mapped to a virtual key.\n";
+        key = 0;
         return false;
     }
     key = keysym & 0xff;
@@ -190,10 +250,16 @@ inline bool AutoTyper::getKeyFromChar(char ch, KeyCode& key, KeyCode& modifier) 
        ch | ascii |   Name   | Value
        \n |  0xa  | Linefeed | 0xff0a  <- [set \n to XK_Return 0xff0d] Do not fit the transform
        \r |  0xd  | Return   | 0xff0d 
-    */ if (ch == '\n') {
-        keysym = XK_Return;
-    } else {
-        keysym =  (0 <= ch && ch < 0x20) ? (0xff00) | ((int) ch) : ((int) ch);
+    */ /* Custom Mapping */
+    switch ((unsigned char)ch) {
+        case '\n'       : keysym = XK_Return;  break;
+        case CHAR_LEFT  : keysym = XK_Left;    break;
+        case CHAR_RIGHT : keysym = XK_Right;   break;
+        case CHAR_UP    : keysym = XK_Up;      break;
+        case CHAR_DOWN  : keysym = XK_Down;    break;
+        default: 
+            keysym = (0 <= ch && ch < 0x20) ? (0xff00) | ((int) ch) : ((int) ch);
+            break;
     }
    
     /* Common Porcess */
