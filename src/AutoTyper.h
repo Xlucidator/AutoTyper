@@ -7,6 +7,7 @@
 #ifdef _WIN32
 
 #include <windows.h>
+#include <imm.h>
 
 using KeySym = UINT; // Virtual-Key Code
 using KeyCode = BYTE; // Scan Code
@@ -47,6 +48,8 @@ private:
     inline void simulateKey(KeyCode key, bool press);
     inline bool isKeyPressed(KeySym keysym);
     inline void flushDisplay();
+
+    void checkIME();
 
 #ifdef _WIN32
     INPUT input[5] = {};

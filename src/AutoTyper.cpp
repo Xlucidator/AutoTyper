@@ -54,14 +54,15 @@ bool AutoTyper::clear() {
 
 void AutoTyper::debug() {
     printf("[Debug]\n");
-    USLEEP(1000 * 1000);
+    USLEEP(2000 * 1000);
 
 #ifdef _WIN32
-    simulateChar('<');
+    checkIME();
+    simulateChar('a');
+    simulateChar('b');
+    simulateChar('c');
     simulateChar('\x7f');
     simulateChar('\n');
-    simulateChar('\r');
-    simulateChar('>');
 
     char ch = 0x81;
     unsigned char uch = 0x81;
@@ -214,14 +215,30 @@ inline bool AutoTyper::isKeyPressed(KeySym keysym) {
     return GetAsyncKeyState(keysym) & 0x8000;
 }
 
-// Deprecated keybd_event
-// inline void AutoTyper::keyPress(KeyCode key) {
-//     keybd_event(key, 0, 0, 0);
-// }
+void AutoTyper::checkIME() {
+    HWND hwnd = GetForegroundWindow();
+    if (!hwnd) {
+        std::cerr << "[Error] Cannot get foreground window!" << std::endl;
+        return;
+    }
 
-// inline void AutoTyper::keyRelease(KeyCode key) {
-//     keybd_event(key, 0, KEYEVENTF_KEYUP, 0);
-// }
+    HIMC hIMC = ImmGetContext(hwnd);
+    if (!hIMC) {
+        std::cerr << "[Error] Cannot get IMM Context!" << std::endl;
+        return;
+    }
+
+    DWORD conversion, sentence;
+    if (ImmGetConversionStatus(hIMC, &conversion, &sentence)) {
+        bool isChinese = conversion & IME_CMODE_NATIVE;
+        if (isChinese) {
+            std::cout << "Detect Chinese IME, Switch to English" << std::endl;
+            ImmSetConversionStatus(hIMC, conversion & ~IME_CMODE_NATIVE, sentence);
+        }
+    }
+
+    ImmReleaseContext(hwnd, hIMC);
+}
 
 #elif __linux__
 
@@ -289,6 +306,10 @@ inline bool AutoTyper::isKeyPressed(KeySym keysym) {
     XQueryKeymap(display, keys);
     KeyCode keycode = XKeysymToKeycode(display, keysym);
     return keys[keycode / 8] & (1 << (keycode % 8));
+}
+
+void AutoTyper::checkIME() {
+    
 }
 
 #endif

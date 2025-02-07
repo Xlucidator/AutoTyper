@@ -16,12 +16,12 @@ if(WIN32 OR CMAKE_SYSTEM_NAME STREQUAL "Windows")
         message(STATUS "Using Microsoft Visual Studio")
 
         add_compile_options(/W4)  # 高警告等级
-        set(LIBRARIES User32.lib)
+        set(LIBRARIES User32.lib Imm32.lib)
     elseif(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
         message(STATUS "Using MinGW")
 
         add_compile_options(-Wall -Wextra -pedantic)
-        set(LIBRARIES User32)
+        set(LIBRARIES User32 Imm32)
     endif()
 
 elseif(UNIX OR CMAKE_SYSTEM_NAME STREQUAL "Linux")

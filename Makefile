@@ -20,7 +20,7 @@ LD_FLAGS += -s -Wl,--gc-sections # -Wl,-strip-all
 
 # Platform-specific settings
 ifeq ($(PLATFORM),WINDOWS)
-    LIBS = -lUser32
+    LIBS = -lUser32 -lImm32
     TARGET = AutoTyper.exe
     RM = del /f /q
     CLEAN_FILES = src\*.o 
