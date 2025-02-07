@@ -3,6 +3,7 @@
 #include "INIParser.h"
 
 /* Section: target */
+std::string io_basedir = "";
 std::string io_srcfile = "target.cpp";
 std::string io_target = "";
 
@@ -21,6 +22,7 @@ bool fit_space_autofill = false;
 void initConfig() {
     INIParser parser("config.ini");
 
+    SET_CONFIG(io, basedir, io_basedir);
     SET_CONFIG(io, target, io_target);
     SET_CONFIG(io, srcfile, io_srcfile);
 

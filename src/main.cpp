@@ -4,6 +4,19 @@
 
 #include <iostream>
 
+constexpr char sep = 
+#ifdef _WIN32
+    '\\';
+#else
+    '/';
+#endif
+
+inline std::string getFullPath(std::string& base, std::string& file) {
+    if (base.empty()) { return file; }
+    if (base.back() == sep) base.pop_back();
+    return base + sep + file;
+}
+
 int main() {
     /*=== Set Configs ===*/
     initConfig();
@@ -11,7 +24,8 @@ int main() {
     
     /*=== AutoTyper ===*/
     AutoTyper typer;
-    typer.type(io_srcfile);
+    std::string full_path = getFullPath(io_basedir, io_srcfile);
+    typer.type(full_path);
     // typer.debug();
 
     return 0;

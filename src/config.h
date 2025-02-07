@@ -4,6 +4,7 @@
 #include <string>
 
 /* key name traits: <section>_<key> */
+extern std::string io_basedir;
 extern std::string io_srcfile;
 extern std::string io_target;
 extern int type_interval;

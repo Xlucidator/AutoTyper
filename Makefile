@@ -23,12 +23,12 @@ ifeq ($(PLATFORM),WINDOWS)
     LIBS = -lUser32
     TARGET = AutoTyper.exe
     RM = del /f /q
-    CLEAN_FILES = src\*.o $(TARGET)
+    CLEAN_FILES = src\*.o 
 else
     LIBS = -lX11 -lXtst
     TARGET = AutoTyper
     RM = rm -f
-    CLEAN_FILES = src/*.o src/**/*.o $(TARGET)
+    CLEAN_FILES = src/*.o src/**/*.o 
 endif
 
 # Directories & Files
@@ -52,3 +52,6 @@ $(TARGET): $(OBJ_FILES)
 # Clean target
 clean:
 	$(RM) $(CLEAN_FILES)
+
+cleanall:
+	$(RM) $(CLEAN_FILES) $(TARGET)
