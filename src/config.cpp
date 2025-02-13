@@ -9,6 +9,7 @@ std::string io_target = "";
 
 /* Section: type */
 int type_interval = 5000;
+bool type_hide_window = false;
 
 /* Section: fit */
 bool fit_view_space_as_tab = false;
@@ -27,6 +28,7 @@ void initConfig() {
     SET_CONFIG(io, srcfile, io_srcfile);
 
     SET_CONFIG(type, interval, 5000);
+    SET_CONFIG(type, hide_window, false);
 
     /* Fit section: could be overwrite by io_target */
     if (io_target == "acsaber") {

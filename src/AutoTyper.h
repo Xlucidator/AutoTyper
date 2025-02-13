@@ -50,6 +50,7 @@ private:
     inline void flushDisplay();
 
     void checkIME();
+    void hideWindow();
 
 #ifdef _WIN32
     INPUT input[5] = {};

@@ -8,6 +8,7 @@ extern std::string io_basedir;
 extern std::string io_srcfile;
 extern std::string io_target;
 extern int type_interval;
+extern bool type_hide_window;
 extern bool fit_view_space_as_tab;
 extern bool fit_brackets_autopair;
 extern bool fit_brace_nextline_pair;

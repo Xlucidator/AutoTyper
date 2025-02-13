@@ -65,7 +65,7 @@ AutoTyper.exe > log.txt # windows
 AutoTyper > log.txt 	# linux
 # 推荐重定向stdio到log.txt，日志开头处可查看实际配置参数值
 
-# 图型界面可双击图标运行，Linux不会生成窗口，Windows会生成执行窗口
+# 图型界面可双击图标运行，Linux不会生成窗口，Windows可配置是否生成执行命令行窗口
 ```
 
 - `config.ini`和应用程序需在同目录，`srcfile`路径指定应正确(默认为应用同目录下的target.cpp)
@@ -85,8 +85,8 @@ AutoTyper > log.txt 	# linux
     - notepad : windows 文本编辑器
 
 - `type` 打字相关参数配置
-  
-- `interval` 输出速度，字符间睡眠时间，单位us
+  - `interval` 输出速度，字符间睡眠时间，单位us
+  - `hide_window` Windows下GUI，是否隐层双击exe后生成的窗口
   
 - `fit` 对目标窗口文本编辑器功能适配（从而抵消输入影响）
   - <font color="red">注意</font> ：调整仅针对正确的C++语法和相对规范的写法，否则请将`target`设为notepad即关闭所有`fit`选项进行纯输出

@@ -11,6 +11,8 @@
 /*=== Global Public Process Function ===*/
 
 bool AutoTyper::init() {
+    if (type_hide_window) hideWindow();
+
 #ifdef __linux__
     display = XOpenDisplay(NULL);
     if (!display) {
@@ -240,6 +242,11 @@ void AutoTyper::checkIME() {
     ImmReleaseContext(hwnd, hIMC);
 }
 
+void AutoTyper::hideWindow() {
+    HWND hwnd = GetConsoleWindow();
+    if (hwnd) ShowWindow(hwnd, SW_HIDE);
+}
+
 #elif __linux__
 
 bool AutoTyper::initModifier() {
@@ -309,6 +316,10 @@ inline bool AutoTyper::isKeyPressed(KeySym keysym) {
 }
 
 void AutoTyper::checkIME() {
+    
+}
+
+void AutoTyper::hideWindow() {
     
 }
 
