@@ -10,12 +10,14 @@ AcWing上有些题没买课无法使用，但是在AC Saber测试模式的题谱
 
 #### Windows
 
-依赖：gcc编译器（Microsoft Visual Studio C++ 或 MinGW），Makefile (MinGW)
+依赖：gcc（Microsoft Visual Studio C++ 或 MinGW），Makefile (MinGW)
 
-Makefile构建
+Makefile构建（偷懒导致的，结果后面跨平台命令手写似乎也很麻烦）
 
 ```powershell
 make 		# build
+make install# install to ./bin/$(VERSION)  can set VERSION before install to control subdir name
+
 make clean 	# clean
 ```
 
@@ -65,7 +67,7 @@ AutoTyper.exe > log.txt # windows
 AutoTyper > log.txt 	# linux
 # 推荐重定向stdio到log.txt，日志开头处可查看实际配置参数值
 
-# 图型界面可双击图标运行，Linux不会生成窗口，Windows可配置是否生成执行命令行窗口
+图型界面可双击图标运行，Linux不会生成窗口，Windows可配置是否生成执行命令行窗口
 ```
 
 - `config.ini`和应用程序需在同目录，`srcfile`路径指定应正确(默认为应用同目录下的target.cpp)

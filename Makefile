@@ -1,10 +1,9 @@
 ## Cross-platform Makefile for AutoTyper
 
 # Phony targets
-.PHONY: all clean release debug
+.PHONY: all clean release debug install
 
 # OS detection
-
 ifeq ($(OS),Windows_NT)
     $(info $(OS): Running on Windows)
     PLATFORM = WINDOWS
@@ -14,6 +13,7 @@ else
 endif
 
 # Variables
+VERSION ?= 0.1.1
 CXX = g++
 CXX_FLAGS = -Wall -Os -std=c++17 -ffunction-sections -fdata-sections # -fno-rtti -fomit-frame-pointer
 LD_FLAGS += -s -Wl,--gc-sections # -Wl,-strip-all
@@ -23,12 +23,18 @@ ifeq ($(PLATFORM),WINDOWS)
     LIBS = -lUser32 -lImm32
     TARGET = AutoTyper.exe
     RM = del /f /q
+    CP = copy
     CLEAN_FILES = src\*.o 
+    BIN_DIR = bin\v$(VERSION)
+    MKBINDIR = if not exist $(BIN_DIR) mkdir $(BIN_DIR)
 else
     LIBS = -lX11 -lXtst
     TARGET = AutoTyper
     RM = rm -f
+    CP = cp
     CLEAN_FILES = src/*.o src/**/*.o 
+    BIN_DIR = bin/v$(VERSION)
+    MKBINDIR = mkdir -p $(BIN_DIR)
 endif
 
 # Directories & Files
@@ -55,3 +61,12 @@ clean:
 
 cleanall:
 	$(RM) $(CLEAN_FILES) $(TARGET)
+
+# Install target
+install: $(TARGET)
+	@echo Installing AutoTyper version $(VERSION) to $(BIN_DIR)
+	@$(MKBINDIR)
+	@$(CP) $(TARGET) $(BIN_DIR)
+	@$(CP) config.ini $(BIN_DIR)
+	@$(CP) target.cpp $(BIN_DIR)
+	@echo Installation complete for version $(VERSION) at $(BIN_DIR)
