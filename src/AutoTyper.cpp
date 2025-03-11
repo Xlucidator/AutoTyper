@@ -74,7 +74,10 @@ void AutoTyper::debug() {
         default:break;
     }
 #elif __linux__
-    simulateChar('a');
+    simulateChar('a'); simulateChar('b'); simulateChar('c');
+    simulateChar(CHAR_LEFT);
+    simulateChar('\x7f');
+    simulateChar('\b');
 #endif
 }
 
@@ -277,6 +280,7 @@ inline bool AutoTyper::getKeyFromChar(char ch, KeyCode& key, KeyCode& modifier) 
     */ /* Custom Mapping */
     switch ((unsigned char)ch) {
         case '\n'       : keysym = XK_Return;  break;
+        case '\x7f'     : keysym = XK_Delete;  break;
         case CHAR_LEFT  : keysym = XK_Left;    break;
         case CHAR_RIGHT : keysym = XK_Right;   break;
         case CHAR_UP    : keysym = XK_Up;      break;
