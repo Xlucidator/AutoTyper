@@ -1,5 +1,6 @@
 ### v0.1.2
 
+- Chore : Refact and improve build process for CMake
 
 ### v0.1.1
 

@@ -4,7 +4,6 @@
 #include "config.h"
 
 #include <fstream>
-#include <unistd.h>
 #include <cstring>
 #include <stack>
 

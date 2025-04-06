@@ -6,59 +6,42 @@ Some problems on AcWing require purchasing courses to use, but they are still av
 
 By simulating peripheral input (currently only the keyboard), the content of a specified file is input into the current window, serving the purpose of pasting; it is especially designed for windows where pasting is not allowed (like AC Saber).
 
-
-
 ### How to Build
 
-#### Windows
+#### Dependency
 
-Dependencies: gcc compiler (Microsoft Visual Studio C++ or MinGW), Makefile (MinGW)
-
-Makefile Build
-
-```powershell
-make        # build
-make clean  # clean
-```
-
-CMake Build
-
-```powershell
-# build
-mkdir build
-cd build
-cmake -G "MinGW Makefiles" ..   # For MSVC: cmake -G "Visual Studio 17 2022" ..
-cmake --build .
-
-# clear
-cmake --build . --target clean
-```
-
-#### Linux/Ubuntu
-
-Only supports X11 server, unsure about Wayland (probably not supported)
-
-Dependencies: Xlib, XTest
-
-```shell
+```bash
+## Linux: Xlib, XTest
 sudo apt install libx11-dev libxtst-dev
+## Windows: Compiler option - MinGW or MSVC
 ```
 
-Makefile Build is the same as above
+#### CMake
 
-CMake Build
-
-```shell
-# build
+```bash
 mkdir build && cd build
-cmake ..
-make
+cmake -G <Generator> .. -DCMAKE_BUILD_TYPE=<BuildType>
+# Windows-MinGW: cmake -G "MinGW Makefiles" .. -DCMAKE_BUILD_TYPE=Release
+# Windows-MSVC : cmake -G "Visual Studio 17 2022" .. -DCMAKE_BUILD_TYPE=Release
+# Linux: cmake .. -DCMAKE_BUILD_TYPE=Release
 
-# clear
-make clean
+cmake --build .                     # <=> make
+cmake --build . --target install    # <=> make install
+cmake --build . --target clean      # <=> make clean
 ```
 
+Default：`CMAKE_INSTALL_PREFIX = ${CMAKE_SOURCE_DIR}`，`CMAKE_BUILD_TYPE = Release`
 
+#### Makefile [Deprecated]
+
+for convenience，target to Linux or MinGW
+
+```powershell
+make 		 # build
+make install # install to ./bin/$(VERSION)  can set VERSION before install to control subdir name
+make clean 	 # clean
+make cleanall
+```
 
 ### How to Use
 
@@ -96,8 +79,6 @@ Parameters can be configured in `config.ini`. If not present or incorrectly reco
   - `view_space_as_tab` The editor views a certain number of spaces as '\t'. When backspacing, it directly deletes 4 (not 8) spaces.
   - `brackets_autopair` The editor auto-pairs brackets.
   - `space_autofill` The editor inherits the indentation (number of spaces) from the previous line and will adjust indentation based on bracket opening and closing.
-
-
 
 ### Additional Notes
 

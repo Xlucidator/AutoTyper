@@ -21,6 +21,8 @@ constexpr auto ESCAPE_KEY = VK_ESCAPE;
 #include <X11/extensions/XTest.h>
 #include <X11/keysym.h>
 
+#include <unistd.h>
+
 #include <unordered_map>
 
 using KeySym = ::KeySym; // X11 KeySym

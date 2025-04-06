@@ -39,6 +39,7 @@ endif
 
 # Directories & Files
 SRC_DIR = src
+PUB_DIR = public
 SRC_FILES := $(wildcard $(SRC_DIR)/**/*.cpp $(SRC_DIR)/*.cpp)
 HDR_FILES := $(wildcard $(SRC_DIR)/**/*.h $(SRC_DIR)/*.h)
 OBJ_FILES := $(patsubst %.cpp,%.o,$(SRC_FILES))
@@ -67,6 +68,6 @@ install: $(TARGET)
 	@echo Installing AutoTyper version $(VERSION) to $(BIN_DIR)
 	@$(MKBINDIR)
 	@$(CP) $(TARGET) $(BIN_DIR)
-	@$(CP) config.ini $(BIN_DIR)
-	@$(CP) target.cpp $(BIN_DIR)
+	@$(CP) $(PUB_DIR)/config.ini $(BIN_DIR)
+	@$(CP) $(PUB_DIR)/target.cpp $(BIN_DIR)
 	@echo Installation complete for version $(VERSION) at $(BIN_DIR)

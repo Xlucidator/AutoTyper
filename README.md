@@ -8,66 +8,52 @@ AcWing上有些题没买课无法使用，但是在AC Saber测试模式的题谱
 
 ### 构建方法
 
-#### Windows
+#### 依赖
 
-依赖：gcc（Microsoft Visual Studio C++ 或 MinGW），Makefile (MinGW)
-
-Makefile构建（偷懒导致的，结果后面跨平台命令手写似乎也很麻烦）
-
-```powershell
-make 		# build
-make install# install to ./bin/$(VERSION)  can set VERSION before install to control subdir name
-
-make clean 	# clean
-```
-
-CMake构建
-
-```powershell
-# build
-mkdir build
-cd build
-cmake -G "MinGW Makefiles" ..   # For MSVC: cmake -G "Visual Studio 17 2022" ..
-cmake --build .
-
-# clear
-cmake --build . --target clean
-```
-
-#### Linux/Ubuntu
-
-仅支持X11服务器，Wayland不知（大概不行）
-
-依赖：Xlib, XTest
-
-```shell
+```bash
+## Linux: Xlib, XTest
 sudo apt install libx11-dev libxtst-dev
+## Windows: Compiler option - MinGW or MSVC
 ```
 
-Makefile构建同上
+#### CMake
 
-CMake构建
-
-```shell
-# build
+```bash
 mkdir build && cd build
-cmake ..
-make
+cmake -G <Generator> .. -DCMAKE_BUILD_TYPE=<BuildType>
+# Windows-MinGW: cmake -G "MinGW Makefiles" .. -DCMAKE_BUILD_TYPE=Release
+# Windows-MSVC : cmake -G "Visual Studio 17 2022" .. -DCMAKE_BUILD_TYPE=Release
+# Linux:         cmake .. -DCMAKE_BUILD_TYPE=Release
 
-# clear
-make clean
+cmake --build .                     # <=> make
+cmake --build . --target install    # <=> make install
+cmake --build . --target clean      # <=> make clean
+```
+
+默认参数：`CMAKE_INSTALL_PREFIX = ${CMAKE_SOURCE_DIR}`，`CMAKE_BUILD_TYPE = Release`
+
+#### Makefile [Deprecated]
+
+省事版，针对Linux或MinGW
+
+```powershell
+make 		 # build
+make install # install to ./bin/$(VERSION)  can set VERSION before install to control subdir name
+make clean 	 # clean
+make cleanall
 ```
 
 ### 使用方式
 
 #### 运行
 
+图型界面可双击图标运行，Linux不会生成窗口，Windows可配置是否生成执行命令行窗口
+
+命令行推荐重定向stdio到log.txt，志开头处可查看实际配置参数值
+
 ```shell
 AutoTyper.exe > log.txt # windows
 AutoTyper > log.txt 	# linux
-# 推荐重定向stdio到log.txt，日志开头处可查看实际配置参数值
-
-图型界面可双击图标运行，Linux不会生成窗口，Windows可配置是否生成执行命令行窗口
 ```
 
 - `config.ini`和应用程序需在同目录，`srcfile`路径指定应正确(默认为应用同目录下的target.cpp)
@@ -79,13 +65,14 @@ AutoTyper > log.txt 	# linux
 `config.ini`中可配置参数，如无或识别错误则将使用默认参数
 
 - `io` 输入输出相关
+  
   - `srcfile` 输入文件，应为绝对路径或相对应用的路径；<font color="red">注意</font> ，仅适配了由vscode写的文件，缩进均存为空格
   - `target` 目标窗口文本编辑器，用于切换适配的输出方式；如正确设置则强制覆盖fit中的配置
     - acsaber : 针对acsaber编辑器（就是这盘醋）
     - vscode : vscode编辑器
     - gedit : ubuntu gedit编辑器
-    - notepad : windows 文本编辑器
-
+  - notepad : windows 文本编辑器
+  
 - `type` 打字相关参数配置
   - `interval` 输出速度，字符间睡眠时间，单位us
   - `hide_window` Windows下GUI，是否隐层双击exe后生成的窗口
